@@ -1,0 +1,31 @@
+{
+	"name": "parameters-finder",
+	"version": "1.0.0",
+	"description": "Open `index.html` in browser to see the app",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "parcel index.html"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/krawieck/parameters-finder.git"
+	},
+	"keywords": [
+		"genetic-algorithm"
+	],
+	"author": "krawieck",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/krawieck/parameters-finder/issues"
+	},
+	"homepage": "https://github.com/krawieck/parameters-finder#readme",
+	"devDependencies": {
+		"parcel-bundler": "^1.10.3",
+		"tslint-config-prettier": "^1.17.0"
+	},
+	"dependencies": {
+		"tslint": "^5.11.0",
+		"typescript": "^3.2.1"
+	}
+}
