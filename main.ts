@@ -1,6 +1,6 @@
 let globalInterval: NodeJS.Timeout
 
-enum ParentsSelectionMethod {
+enum OffspringSelectionMethod {
   Shuffle,
   Clone,
   Average
