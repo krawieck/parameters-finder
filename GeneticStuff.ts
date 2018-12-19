@@ -4,15 +4,16 @@ export enum OffspringGenerationMethod {
   Average
 }
 
-export enum FitnessMethod {
-  Max,
-  Propability,
-  Propability2
-}
+// export enum FitnessMethod {
+//   Max,
+//   Propability,
+//   Propability2
+// }
 
 export enum ParentsSelectionMethod {
   Top,
-  SpinTheCheese
+  SpinTheCheese,
+  SpinTheCheeseSquared
 }
 
 export type Dna = {
@@ -29,7 +30,7 @@ export interface IGeneticStuffArgs {
   numberOfParents?: number
   populationSize?: number
   messiahChance?: number
-  fitnessMethod?: FitnessMethod
+  // fitnessMethod?: FitnessMethod
   offspringGenerationMethod?: OffspringGenerationMethod
   parentsSelectionMethod?: ParentsSelectionMethod
 }
@@ -46,7 +47,7 @@ export default class GeneticStuff {
   public populationSize: number
   public messiahChance: number
 
-  public fitnessMethod: FitnessMethod
+  // public fitnessMethod: FitnessMethod
   public offspringGenerationMethod: OffspringGenerationMethod
   public parentsSelectionMethod: ParentsSelectionMethod
 
@@ -58,7 +59,7 @@ export default class GeneticStuff {
       populationSize = 100,
       mutationRate = 0.01,
       numberOfParents = 2,
-      fitnessMethod = FitnessMethod.Max,
+      // fitnessMethod = FitnessMethod.Max,
       offspringGenerationMethod = OffspringGenerationMethod.Shuffle,
       parentsSelectionMethod = ParentsSelectionMethod.SpinTheCheese
     }: IGeneticStuffArgs = {
@@ -66,7 +67,7 @@ export default class GeneticStuff {
       populationSize: 100,
       mutationRate: 0.01,
       numberOfParents: 2,
-      fitnessMethod: FitnessMethod.Max,
+      // fitnessMethod: FitnessMethod.Max,
       offspringGenerationMethod: OffspringGenerationMethod.Shuffle,
       parentsSelectionMethod: ParentsSelectionMethod.SpinTheCheese
     }
@@ -74,7 +75,7 @@ export default class GeneticStuff {
     this.mutationRate = mutationRate
     this.populationSize = populationSize
     this.numberOfParents = numberOfParents
-    this.fitnessMethod = fitnessMethod
+    // this.fitnessMethod = fitnessMethod
     this.offspringGenerationMethod = offspringGenerationMethod
     this.parentsSelectionMethod = parentsSelectionMethod
     this.messiahChance = messiahChance
@@ -113,14 +114,18 @@ export default class GeneticStuff {
 
   public NextGen(): void {
     // generate parents
-    const newGen: Dna[] = this.SelectParents(this.population)
+    const parents: Dna[] = this.SelectParents(this.population)
 
     // mating
-    for (let i = 0; i < this.populationSize - this.numberOfParents; i++) {
-      newGen.push(
-        this.GenerateOffspring(newGen.slice(0, this.numberOfParents))
-      )
-    }
+    const newGen: Dna[] = Array(this.populationSize)
+      .fill(0)
+      .map(() => this.GenerateOffspring(parents))
+
+    // for (let i = 0; i < this.populationSize; i++) {
+    //   newGen.push(
+    //     this.GenerateOffspring(newGen.slice(0, this.numberOfParents))
+    //   )
+    // }
 
     // calc fitness and sort by it
     this.population = newGen
@@ -164,38 +169,45 @@ export default class GeneticStuff {
   }
 
   public SelectParents(population: Member[]): Dna[] {
-    switch (this.parentsSelectionMethod) {
-      case ParentsSelectionMethod.Top: {
-        population = population
-          .map(e => ({ ...e, fitness: this.CalcFitness(e.dna) }))
-          .sort((a, b) => b.fitness - a.fitness)
-        return population.slice(0, this.numberOfParents).map(e => e.dna)
-      }
-      case ParentsSelectionMethod.SpinTheCheese: {
-        // @FIXME IS IT WORKING CORRECTLY?
-        function spinTheCheese(sortedPopulation: Member[]): [Member, Member[]] {
-          const sum = sortedPopulation.reduce((s, a) => s + a.fitness, 0)
-          const slice = getRand(0, sum)
+    // @FIXME IS spinTheCheese WORKING CORRECTLY?
+    function spinTheCheese(sortedPopulation: Member[]): [Member, Member[]] {
+      const sum = sortedPopulation.reduce((s, a) => s + a.fitness, 0)
+      const slice = getRand(0, sum)
 
-          let max = 0
-          for (const [i, e] of sortedPopulation.entries()) {
-            // @FIXME resolve the <= and >=
-            if (
-              (max <= slice && max + e.fitness >= slice) ||
-              (max >= slice && max + e.fitness <= slice)
-            ) {
-              return [sortedPopulation.splice(i, 1)[0], sortedPopulation]
-            }
-
-            max += e.fitness
-          }
-          // this should never happen
-          throw new Error("idk what happened, but u messed sth up")
+      let max = 0
+      for (const [i, e] of sortedPopulation.entries()) {
+        // @FIXME resolve the <= and >=
+        if (
+          (max <= slice && max + e.fitness >= slice) ||
+          (max >= slice && max + e.fitness <= slice)
+        ) {
+          return [sortedPopulation.splice(i, 1)[0], sortedPopulation]
         }
 
+        max += e.fitness
+      }
+      // this should never happen
+      throw new Error("idk what happened, but u messed sth up")
+    }
+    switch (this.parentsSelectionMethod) {
+      case ParentsSelectionMethod.Top: {
+        return population
+          .map(e => ({ ...e, fitness: this.CalcFitness(e.dna) }))
+          .sort((a, b) => b.fitness - a.fitness)
+          .slice(0, this.numberOfParents)
+          .map(e => e.dna)
+      }
+      case ParentsSelectionMethod.SpinTheCheese ||
+        ParentsSelectionMethod.SpinTheCheeseSquared: {
         // calculate fitness and sort the population by it
         population = population
-          .map(e => ({ ...e, fitness: this.CalcFitness(e.dna) }))
+          .map(e => {
+            const fitness = this.CalcFitness(e.dna)
+            return {
+              ...e,
+              fitness
+            }
+          })
           .sort((a, b) => b.fitness - a.fitness)
 
         const parents = []

@@ -1,4 +1,8 @@
-import GeneticStuff, { Dna, ParentsSelectionMethod } from "./GeneticStuff"
+import GeneticStuff, {
+  Dna,
+  OffspringGenerationMethod,
+  ParentsSelectionMethod
+} from "./GeneticStuff"
 
 let globalInterval: NodeJS.Timeout
 
@@ -42,19 +46,21 @@ function doTheAiMagic() {
         Math.abs(a * x2 ** 2 + b * x2 + c)) *
       -1,
     {
-      parentsSelectionMethod: ParentsSelectionMethod.SpinTheCheese,
+      parentsSelectionMethod: ParentsSelectionMethod.Top,
+      offspringGenerationMethod: OffspringGenerationMethod.Clone,
       populationSize: 10
     }
   )
 
   globalInterval = setInterval(() => {
     g.NextGen()
-    aElement.innerHTML = String(g.population[0].dna.a)
-    bElement.innerHTML = String(g.population[0].dna.b)
-    cElement.innerHTML = String(g.population[0].dna.c)
-    distanceElement.innerHTML = String(g.topFitness * -1)
-    // console.log(g.population)
-  }, 10)
+    if (distanceElement.innerHTML !== String(g.topFitness * -1)) {
+      aElement.innerHTML = String(g.population[0].dna.a)
+      bElement.innerHTML = String(g.population[0].dna.b)
+      cElement.innerHTML = String(g.population[0].dna.c)
+      distanceElement.innerHTML = String(g.topFitness * -1)
+    }
+  }, 60)
 }
 
 doTheAiMagic()
