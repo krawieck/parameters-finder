@@ -1,3 +1,5 @@
 # parameters-finder
 
-Open `index.html` in browser to see the app
+This app requires node.js to run.
+
+`npm start` to run it
