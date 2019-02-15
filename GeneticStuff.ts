@@ -41,6 +41,7 @@ const getRand = (min: number, max: number): number =>
 export default class GeneticStuff {
   public topFitness: number
   public population: Member[]
+  public generationCount: number
 
   public mutationRate: number
   public numberOfParents: number
@@ -79,6 +80,7 @@ export default class GeneticStuff {
     this.offspringGenerationMethod = offspringGenerationMethod
     this.parentsSelectionMethod = parentsSelectionMethod
     this.messiahChance = messiahChance
+    this.generationCount = 0
 
     // intialize population with random values
     this.population = new Array(this.populationSize)
@@ -113,6 +115,7 @@ export default class GeneticStuff {
   }
 
   public NextGen(): void {
+    this.generationCount++
     // generate parents
     const parents: Dna[] = this.SelectParents(this.population)
 
